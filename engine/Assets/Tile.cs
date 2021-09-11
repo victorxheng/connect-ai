@@ -29,23 +29,28 @@ public class Tile : MonoBehaviour
             return y;
         }
 
-        public void onClick(){
-            if(b.winner != ((int)Game.color.BLANK)){
-                return;
-            }
-            if(b.board[y,x]!=((int)Game.color.BLANK)){//MOVE DIRECTLY INTO TILE SCRIPT
-                return;
-            }
-            
-            b.move(y,x);
-            
-            if(b.currentMoveColor == ((int)Game.color.RED)){//move this to Game
-                //set sprite to red
-                self.sprite = red;
-            }
-            else{
-                self.sprite = black;
-            }
+    public void onClick()
+    {
+        if (b.winner != ((int)Game.color.BLANK))
+        {
+            return;
         }
+        if (b.board[y, x] != ((int)Game.color.BLANK))
+        {
+            return;
+        }
+
+        if (b.currentMoveColor == ((int)Game.color.RED))
+        {
+            //set sprite to red
+            self.sprite = red;
+        }
+        else
+        {
+            self.sprite = black;
+        }
+        b.move(y, x);
+
+    }
 
 }

@@ -11,10 +11,15 @@ public class Minimax : MonoBehaviour
     private void ComputeMove(){
         
     }
-    private int Project(){//MINIMAX RECURSION
+    private int ProjectMove(){//MINIMAX RECURSION
         return 0;
     }
     
+    private int evaluateBoard()
+    {
+
+        return 1000;
+    }
 
     private HashSet<Point> validMoves(int[,] b, HashSet<Point> blackPieces, HashSet<Point> redPieces)
     {

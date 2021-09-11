@@ -7,7 +7,12 @@ public class Game : MonoBehaviour
     public const int rows = 20;
     public const int cols = 20;
     public const int winCount = 5;
+
     public int[,] board; // [x] [y]
+
+    public int blackScore;
+    public int redScore;
+
     public HashSet<Point> blackPieces;
     public HashSet<Point> redPieces;
     private bool showBoard = true;
@@ -81,7 +86,6 @@ public class Game : MonoBehaviour
             board[y, x] = ((int)color.BLACK);//move black
             blackPieces.Add(new Point(y,x));
         }
-
         bool winningMove = evaluateForWin(y, x, currentMoveColor);
         if (winningMove)
         {
@@ -90,7 +94,7 @@ public class Game : MonoBehaviour
         }
         //switch turns
         currentMoveColor = currentMoveColor == ((int)color.RED) ? ((int)color.BLACK) : ((int)color.RED);
-        minimax.showValidMoves();
+        //minimax.showValidMoves();
     }
 
     private bool evaluateForWin(int y, int x, int moveColor)
@@ -99,6 +103,7 @@ public class Game : MonoBehaviour
         if (checkDirection(y, x, moveColor, 1, 0)) return true;
         if (checkDirection(y, x, moveColor, 1, 1)) return true;
         if (checkDirection(y, x, moveColor, -1, 1)) return true;
+        //Debug.Log($"Red Score: {redScore}; Black Score: {blackScore}");
         return false;
     }
     private bool checkDirection(int y, int x, int moveColor, int yChange, int xChange)
@@ -120,16 +125,34 @@ public class Game : MonoBehaviour
             yPointer -= yChange;
             xPointer -= xChange;
         }
-        if (count >= winCount)
+        if(moveColor == (int)color.RED)
         {
-            return true;
+            redScore += (int)Mathf.Pow(3,count - 1)-1;
+
+            if (count >= winCount)
+            {
+                redScore += 1000;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         else
         {
-            return false;
+            blackScore += (int)Mathf.Pow(3, count - 1)-1;
+
+            if (count >= winCount)
+            {
+                blackScore += 1000;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
-
-
 
 }
