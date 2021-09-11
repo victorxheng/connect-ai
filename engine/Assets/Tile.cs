@@ -5,29 +5,34 @@ using UnityEngine.UI;
 
 public class Tile : MonoBehaviour
 {
-    
-        private int x;
-        private int y;
 
-        public Sprite blank;
-        public Sprite red;
-        public Sprite black;
+    private int x;
+    private int y;
 
-        public Image self;
+    public Sprite blank;
+    public Sprite red;
+    public Sprite black;
 
-        Game game;
-        public void Init(int y, int x){   
-            game =  GameObject.Find("Board").GetComponent<Game>();         
-            this.y = y;
-            this.x = x;
-            self.sprite = blank;
-        }
-        public int GetX(){
-            return x;
-        }
-        public int GetY(){
-            return y;
-        }
+    public Image self;
+
+    Game game;
+    Minimax ai;
+    public void Init(int y, int x)
+    {
+        game = GameObject.Find("Board").GetComponent<Game>();
+        ai = GameObject.Find("Board").GetComponent<Minimax>();
+        this.y = y;
+        this.x = x;
+        self.sprite = blank;
+    }
+    public int GetX()
+    {
+        return x;
+    }
+    public int GetY()
+    {
+        return y;
+    }
 
     public void onClick()
     {
@@ -49,14 +54,16 @@ public class Tile : MonoBehaviour
         {
             self.sprite = black;
         }
-        game.b = game.b.Move(new Point(y,x));
+        game.b = game.b.Move(new Point(y, x));
 
         //max score of board: 100,000,000 (3^16)
         if (Mathf.Abs(game.b.score) > 100000000)
         {
             Debug.Log("Player won: " + game.b.score);
-            game.winner = game.b.score > 0 ? (int) Game.color.BLACK : (int) Game.color.RED;
+            game.winner = game.b.score > 0 ? (int)Game.color.BLACK : (int)Game.color.RED;
         }
+
+        game.b = ai.ComputeMove(game.b);
     }
 
 }

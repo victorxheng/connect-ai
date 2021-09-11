@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,45 +8,65 @@ public class Minimax : MonoBehaviour
 {
     public Game game;
 
+    private int depth = 2;
+    public Board ComputeMove(Board b)
+    {
+        HashSet<Point> moves = ValidMoves(b.board, b.pieces);
 
-    private void ComputeMove(){
-        //loop through all numbers and choose the max num
+        int value = b.moveColor == (int)Game.color.BLACK ? Int32.MinValue : Int32.MaxValue;
+        Point movePoint = new Point(0, 0);
+        foreach (Point p in moves)
+        {
+            int num = Evaluate(b.Move(p), depth - 1);
+            if (b.moveColor == (int)Game.color.BLACK && num > value) { value = num; movePoint = p; }
+            else if (num < value) { value = num; movePoint = p; }
+        }
+        Debug.Log(movePoint.ToString());
+        return b.Move(movePoint);
     }
 
-    //params: board, black pieces, red pieces, black score, red score, depth
-    private int MiniMax(Board b, int depth){//MINIMAX RECURSION
+    //MINIMAX ALGORITHM RECURSION HERE
+    private int Evaluate(Board b, int depth)
+    {//MINIMAX RECURSION
         //check depth: base case
-        if(depth == 1)
+        if (depth == 1)
         {
-           return b.score;
+            return b.score;
         }
         //create list of all valid moves for given board
-        //loop through each valid move 
-        //develop a new board and new heuristic and passing it down
-        //check for largest/smallest value and return that value
+        HashSet<Point> moves = ValidMoves(b.board, b.pieces);
+
+        int value = b.moveColor == (int)Game.color.BLACK ? Int32.MinValue : Int32.MaxValue;
+
+        foreach (Point p in moves)
+        {
+            int num = Evaluate(b.Move(p), depth - 1);
+            if (b.moveColor == (int)Game.color.BLACK && num > value) value = num;
+            else if (num < value) value = num;
+        }
 
         //alpha beta pruning
         //check value above and compare it based on min or max: prune
         return 0;
     }
 
-    private HashSet<Point> validMoves(int[,] b, HashSet<Point> pieces)
+    private HashSet<Point> ValidMoves(int[,] b, HashSet<Point> pieces)
     {
-        HashSet<Point> o = new HashSet<Point>(); 
+        HashSet<Point> o = new HashSet<Point>();
         foreach (Point p in pieces)
         {
-            checkPoint(o, b, p, 1, 1);
-            checkPoint(o, b, p, 0, 1);
-            checkPoint(o, b, p, 1, 0);
-            checkPoint(o, b, p, -1, -1);
-            checkPoint(o, b, p, 0, -1);
-            checkPoint(o, b, p, -1, 0);
-            checkPoint(o, b, p, -1, 1);
-            checkPoint(o, b, p, 1, -1);
+            CheckPoint(o, b, p, 1, 1);
+            CheckPoint(o, b, p, 0, 1);
+            CheckPoint(o, b, p, 1, 0);
+            CheckPoint(o, b, p, -1, -1);
+            CheckPoint(o, b, p, 0, -1);
+            CheckPoint(o, b, p, -1, 0);
+            CheckPoint(o, b, p, -1, 1);
+            CheckPoint(o, b, p, 1, -1);
         }
         return o;
     }
-    private void checkPoint(HashSet<Point> o, int[,] b, Point p, int yChange, int xChange)
+    private void CheckPoint(HashSet<Point> o, int[,] b, Point p, int yChange, int xChange)
     {
         //checks if position is a valid move (touching another piece)
         if (p.y + yChange < Game.rows && p.x + xChange < Game.cols &&
@@ -89,6 +110,8 @@ public class Point
         this.y = y;
         this.x = x;
     }
+    override
+    public string ToString() { return $"({x},{y})"; }
 }
 
 public class Board
@@ -98,6 +121,7 @@ public class Board
     public HashSet<Point> pieces;
     public int score; //black = positive, red = negative
     public int moveColor;
+
 
     public Board(int[,] board, HashSet<Point> pieces, int score, int moveColor)
     {
@@ -109,11 +133,11 @@ public class Board
 
     public Board Move(Point p)
     {
-        Board newBoard = (Board) this.MemberwiseClone(); //new board instance
+        Board newBoard = (Board)this.MemberwiseClone(); //new board instance
         newBoard.board[p.y, p.x] = moveColor; //add piece to board
         newBoard.pieces.Add(new Point(p.y, p.x)); //add piece to list
         newBoard.score += AddToScore(p.y, p.x); //change score
-        newBoard.moveColor = moveColor == ((int) Game.color.RED) ? ((int)Game.color.BLACK) : ((int)Game.color.RED); //change move color
+        newBoard.moveColor = moveColor == ((int)Game.color.RED) ? ((int)Game.color.BLACK) : ((int)Game.color.RED); //change move color
         return newBoard;
     }
 
@@ -147,13 +171,13 @@ public class Board
         }
 
         int delta = 0;
-        if (moveColor == (int) Game.color.RED)
-        { 
+        if (moveColor == (int)Game.color.RED)
+        {
             delta -= (int)Mathf.Pow(3, count - 1) - 1;
             if (count >= Game.winCount) delta -= 1000000000;
         }
         else
-        { 
+        {
             delta += (int)Mathf.Pow(3, count - 1) - 1;
             if (count >= Game.winCount) delta += 1000000000;
         }
