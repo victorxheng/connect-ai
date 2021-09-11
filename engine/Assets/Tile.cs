@@ -15,9 +15,9 @@ public class Tile : MonoBehaviour
 
         public Image self;
 
-        Game b;
+        Game game;
         public void Init(int y, int x){   
-            b =  GameObject.Find("Board").GetComponent<Game>();         
+            game =  GameObject.Find("Board").GetComponent<Game>();         
             this.y = y;
             this.x = x;
             self.sprite = blank;
@@ -31,16 +31,16 @@ public class Tile : MonoBehaviour
 
     public void onClick()
     {
-        if (b.winner != ((int)Game.color.BLANK))
+        if (game.winner != ((int)Game.color.BLANK))
         {
             return;
         }
-        if (b.board[y, x] != ((int)Game.color.BLANK))
+        if (game.b.board[y, x] != ((int)Game.color.BLANK))
         {
             return;
         }
 
-        if (b.currentMoveColor == ((int)Game.color.RED))
+        if (game.b.moveColor == ((int)Game.color.RED))
         {
             //set sprite to red
             self.sprite = red;
@@ -49,8 +49,14 @@ public class Tile : MonoBehaviour
         {
             self.sprite = black;
         }
-        b.move(y, x);
+        game.b = game.b.Move(new Point(y,x));
 
+        //max score of board: 100,000,000 (3^16)
+        if (Mathf.Abs(game.b.score) > 100000000)
+        {
+            Debug.Log("Player won: " + game.b.score);
+            game.winner = game.b.score > 0 ? (int) Game.color.BLACK : (int) Game.color.RED;
+        }
     }
 
 }
