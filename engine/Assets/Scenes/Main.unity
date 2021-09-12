@@ -283,16 +283,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecb61d99261831640b60034814542e43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentMoveColor: 0
   horizontalLayoutGroup: {fileID: 1622371483017666552, guid: bfc8e6f01cb31624bb5f7e1a7fa1f23e, type: 3}
   tile: {fileID: 764828201444968861, guid: e50d7af0485b12e4b9fed022959bb9d3, type: 3}
   verticalLayoutGroup: {fileID: 376840621}
-  blankSprite: {fileID: 21300000, guid: 2209df0ba9d7e774da3061c8b7ea7002, type: 3}
-  redSprite: {fileID: 21300000, guid: de30e7c4db2d9414598b47410f1901fb, type: 3}
-  blackSprite: {fileID: 21300000, guid: 1ea38c8419328b6459699a627ac27535, type: 3}
-  blueSprite: {fileID: 21300000, guid: 0b8397dd02880ee48a52339f8cd90bb0, type: 3}
   winner: 0
-  minimax: {fileID: 376840623}
+  ai: {fileID: 376840623}
+  blank: {fileID: 21300000, guid: 2209df0ba9d7e774da3061c8b7ea7002, type: 3}
+  red: {fileID: 21300000, guid: de30e7c4db2d9414598b47410f1901fb, type: 3}
+  black: {fileID: 21300000, guid: 1ea38c8419328b6459699a627ac27535, type: 3}
+  AiThinking: 0
 --- !u!114 &376840623
 MonoBehaviour:
   m_ObjectHideFlags: 0

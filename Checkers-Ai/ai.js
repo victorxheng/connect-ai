@@ -28,12 +28,7 @@ export function computerMove(validMoves, copyBoard, color) {
       let board = copy(copyBoard);
 
       let updatedSet = updateBoard(
-          element[0],
-          element[1],
-          element[2],
-          element[3],
-          board
-      );
+          element[0],element[1],element[2],element[3], board);
 
       let newBoard = updatedSet[0];
       let multijump = updatedSet[1];
@@ -41,14 +36,7 @@ export function computerMove(validMoves, copyBoard, color) {
       let value;
 
       if (multijump) {
-          value = minimax(
-              copy(newBoard),
-              redList,
-              blackList,
-              depth,
-              color,
-              true,
-              minmaxValue,
+          value = minimax(copy(newBoard),redList,blackList,depth,color,true,minmaxValue,
               [true, element[2], element[3]]
           );
       } else {

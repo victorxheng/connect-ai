@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Game : MonoBehaviour
 {
@@ -19,7 +20,14 @@ public class Game : MonoBehaviour
 
     public int winner = ((int)color.BLANK);
 
-    public Minimax minimax;
+    public Minimax ai;
+
+    public Dictionary<(int,int), Tile> Layout;
+
+
+    public Sprite blank;
+    public Sprite red;
+    public Sprite black;
 
     public enum color
     { //blank is 0
@@ -43,6 +51,8 @@ public class Game : MonoBehaviour
         {
             return;
         }
+        Layout = new Dictionary<(int,int), Tile>();
+
         foreach (GameObject g in verticalLayoutGroup)
         {//clear board
             Destroy(g);
@@ -58,7 +68,54 @@ public class Game : MonoBehaviour
                 square.name = i+","+j;
                 Tile v = square.GetComponent<Tile>();
                 v.Init(i, j);
+                Layout.Add((i,j), v);
             }
+        }
+    }
+    public bool AiThinking = false;
+    public void PlayerClick(Image self, int y, int x)
+    {
+        if (b.moveColor == ((int)Game.color.RED))
+        {
+            self.sprite = red;
+        }
+        else
+        {
+            self.sprite = black;
+        }
+
+        b = b.Move(new Point(y, x));
+
+        //max score of board: 100,000,000 (3^16)
+        if (Mathf.Abs(b.score) > 100000000)
+        {
+            Debug.Log("Player won: " + b.score);
+            winner = b.score > 0 ? (int)Game.color.BLACK : (int)Game.color.RED;
+        }
+
+        AiThinking = true;
+        b = ai.ComputeMove(b);
+        AiThinking = false;
+
+        //max score of board: 100,000,000 (3^16)
+        if (Mathf.Abs(b.score) > 100000000)
+        {
+            Debug.Log("Player won: " + b.score);
+            winner = b.score > 0 ? (int)Game.color.BLACK : (int)Game.color.RED;
+        }
+        b.PrintBoard();
+    }
+
+    public void AiMove(Point p)
+    {
+        Tile t = Layout[(p.y,p.x)];
+        if (b.moveColor == ((int)Game.color.RED))
+        {
+            t.self.sprite = red;
+        }
+        else
+        {
+            t.self.sprite = black;
         }
     }
 }

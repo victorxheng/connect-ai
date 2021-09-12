@@ -8,7 +8,7 @@ public class Minimax : MonoBehaviour
 {
     public Game game;
 
-    private int depth = 3;
+    private int depth = 2;
     public Board ComputeMove(Board b)
     {
         HashSet<Point> moves = ValidMoves(b.board, b.pieces);
@@ -17,20 +17,21 @@ public class Minimax : MonoBehaviour
         Point movePoint = new Point(0, 0);
         foreach (Point p in moves)
         {
-            int num = Evaluate(b.Move(p), depth, value);
+            int num = Evaluate(b.Move(p), depth - 1);
             if (b.moveColor == (int)Game.color.BLACK && num > value) { value = num; movePoint = p; }
-            else if (b.moveColor == (int)Game.color.RED && num < value) { value = num; movePoint = p; }
+            else if (num < value) { value = num; movePoint = p; }
         }
-        game.AiMove(movePoint);
+        Debug.Log(movePoint.ToString());
         return b.Move(movePoint);
     }
 
     //MINIMAX ALGORITHM RECURSION HERE
-    private int Evaluate(Board b, int depth, int valueAbove)
+    private int Evaluate(Board b, int depth)
     {//MINIMAX RECURSION
         //check depth: base case
         if (depth == 1)
         {
+            b.PrintBoard();
             return b.score;
         }
         //create list of all valid moves for given board
@@ -40,21 +41,14 @@ public class Minimax : MonoBehaviour
 
         foreach (Point p in moves)
         {
-            int num = Evaluate(b.Move(p), depth - 1, value);
-            if (b.moveColor == (int)Game.color.BLACK)
-            {
-                if (num > value) value = num;
-                if (value > valueAbove) return value;
-            }
-            else 
-            {
-                if (num < value) value = num;
-                if (value < valueAbove) return value;
-            }
+            int num = Evaluate(b.Move(p), depth - 1);
+            if (b.moveColor == (int)Game.color.BLACK && num > value) value = num;
+            else if (num < value) value = num;
         }
 
+        //alpha beta pruning
         //check value above and compare it based on min or max: prune
-        return value;
+        return 0;
     }
 
     private HashSet<Point> ValidMoves(int[,] b, HashSet<Point> pieces)
@@ -82,6 +76,31 @@ public class Minimax : MonoBehaviour
             o.Add(new Point(p.y + yChange, p.x + xChange));
     }
 
+    /*
+    //FOR TESTING PURPOSES
+    HashSet<Point> moves;
+    public void showValidMoves()
+    {
+        moves = validMoves(game.board, game.blackPieces, game.redPieces);
+        foreach (Point p in moves)
+        {
+            GameObject g = GameObject.Find(p.y + "," + p.x);
+            Image img = g.GetComponent<Image>();
+            img.sprite = game.blueSprite;
+        }
+    }
+    public void clearValidMoves()
+    {
+        if (moves != null)
+        {
+            foreach (Point p in moves)
+            {
+                GameObject g = GameObject.Find(p.y + "," + p.x);
+                Image img = g.GetComponent<Image>();
+                img.sprite = game.blankSprite;
+            }
+        }
+    }*/
 }
 public class Point
 {
@@ -92,13 +111,8 @@ public class Point
         this.y = y;
         this.x = x;
     }
-    public override bool Equals(System.Object obj)
-    {
-        Point p = (Point) obj;
-        return  (y == p.y) && (x == p.x);        
-    }
-
-    public override string ToString() { return $"({x},{y})"; }
+    override
+    public string ToString() { return $"({x},{y})"; }
 }
 
 public class Board
