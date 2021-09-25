@@ -7,11 +7,11 @@ public class Game : MonoBehaviour
 {
     public const int rows = 20;
     public const int cols = 20;
-    public const int winCount = 5;
+    public const int winCount =5;
 
     public Board b;
 
-    private bool showBoard = true;
+    public const bool showBoard = true;
 
     public GameObject horizontalLayoutGroup;
     public GameObject tile;
@@ -42,13 +42,14 @@ public class Game : MonoBehaviour
     }
     private void newBoard()
     {
-        b = new Board(new int[rows, cols], new HashSet<Point>(), 0, (int) color.RED);
+        b = new Board(new int[rows, cols], new HashSet<(int,int)>(), 0, (int) color.RED);
     }
 
     private void buildBoard() // renders the board on screen. clears anything already there
     {
         if (!showBoard)
         {
+            RobotPlaysItself();
             return;
         }
         Layout = new Dictionary<(int,int), Tile>();
@@ -72,6 +73,30 @@ public class Game : MonoBehaviour
             }
         }
     }
+
+    private void RobotPlaysItself()
+    {
+        while (true)
+        {
+            b = ai.ComputeMove(b);
+
+            //max score of board: 100,000,000 (3^16)
+            if (Mathf.Abs(b.score) > 100000000)
+            {
+                Debug.Log("Player won: " + b.score);
+                winner = b.score > 0 ? (int)Game.color.BLACK : (int)Game.color.RED;
+                break;
+            }
+            else if (b.tieGame)
+            {
+                Debug.Log("Tie Game");
+                winner = 3;
+                break;
+            }
+        }
+        b.PrintBoard();
+    }
+
     public bool AiThinking = false;
     public void PlayerClick(Image self, int y, int x)
     {
@@ -91,6 +116,7 @@ public class Game : MonoBehaviour
         {
             Debug.Log("Player won: " + b.score);
             winner = b.score > 0 ? (int)Game.color.BLACK : (int)Game.color.RED;
+            return;
         }
 
         AiThinking = true;
@@ -103,7 +129,11 @@ public class Game : MonoBehaviour
             Debug.Log("Player won: " + b.score);
             winner = b.score > 0 ? (int)Game.color.BLACK : (int)Game.color.RED;
         }
-        b.PrintBoard();
+        else if (b.tieGame)
+        {
+            Debug.Log("Tie Game");
+            winner = 3;
+        }
     }
 
     public void AiMove(Point p)

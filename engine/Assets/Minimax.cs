@@ -9,58 +9,65 @@ public class Minimax : MonoBehaviour
     public Game game;
 
     private int depth = 3;
+
     public Board ComputeMove(Board b)
     {
-        HashSet<Point> moves = ValidMoves(b.board, b.pieces);
+        HashSet<(int,int)> moves = ValidMoves(b.board, b.pieces);
+
+        if (b.pieces.Count == 0) return b.Move(new Point(Game.rows/2,Game.cols/2));
+
+        if (moves.Count == 0) { b.tieGame = true; return b; }//TIE GAME
 
         int value = b.moveColor == (int)Game.color.BLACK ? Int32.MinValue : Int32.MaxValue;
         Point movePoint = new Point(0, 0);
-        foreach (Point p in moves)
+        foreach ((int,int) p in moves)
         {
-            int num = Evaluate(b.Move(p), depth, value);
-            if (b.moveColor == (int)Game.color.BLACK && num > value) { value = num; movePoint = p; }
-            else if (b.moveColor == (int)Game.color.RED && num < value) { value = num; movePoint = p; }
-        }
-        game.AiMove(movePoint);
+            int num = Evaluate(b.Move(new Point(p.Item1,p.Item2)), depth, value);
+            if (b.moveColor == (int)Game.color.BLACK && num > value) { value = num; movePoint = new Point(p.Item1,p.Item2); }
+            else if (b.moveColor == (int)Game.color.RED && num < value) { value = num; movePoint = new Point(p.Item1, p.Item2); }
+        }        
+        if(Game.showBoard) game.AiMove(movePoint);
         return b.Move(movePoint);
     }
 
     //MINIMAX ALGORITHM RECURSION HERE
     private int Evaluate(Board b, int depth, int valueAbove)
-    {//MINIMAX RECURSION
-        //check depth: base case
-        if (depth == 1)
+    {
+        if (depth == 1|| Mathf.Abs(b.score) > 100000000)
         {
             return b.score;
         }
+
         //create list of all valid moves for given board
-        HashSet<Point> moves = ValidMoves(b.board, b.pieces);
+        HashSet<(int, int)> moves = ValidMoves(b.board, b.pieces);
+
+        //tie game
+        if (moves.Count == 0) return 0;
 
         int value = b.moveColor == (int)Game.color.BLACK ? Int32.MinValue : Int32.MaxValue;
 
-        foreach (Point p in moves)
+        foreach ((int, int) p in moves)
         {
-            int num = Evaluate(b.Move(p), depth - 1, value);
+            int num = Evaluate(b.Move(new Point(p.Item1,p.Item2)), depth - 1, value);
             if (b.moveColor == (int)Game.color.BLACK)
             {
-                if (num > value) value = num;
+                if (num > value) value = num; 
                 if (value > valueAbove) return value;
             }
             else 
             {
-                if (num < value) value = num;
+                if (num < value) value = num; 
                 if (value < valueAbove) return value;
             }
         }
 
-        //check value above and compare it based on min or max: prune
         return value;
     }
 
-    private HashSet<Point> ValidMoves(int[,] b, HashSet<Point> pieces)
+    private HashSet<(int,int)> ValidMoves(int[,] b, HashSet<(int,int)> pieces)
     {
-        HashSet<Point> o = new HashSet<Point>();
-        foreach (Point p in pieces)
+        HashSet<(int,int)> o = new HashSet<(int,int)>();
+        foreach ((int,int) p in pieces)
         {
             CheckPoint(o, b, p, 1, 1);
             CheckPoint(o, b, p, 0, 1);
@@ -73,13 +80,13 @@ public class Minimax : MonoBehaviour
         }
         return o;
     }
-    private void CheckPoint(HashSet<Point> o, int[,] b, Point p, int yChange, int xChange)
+    private void CheckPoint(HashSet<(int,int)> o, int[,] b, (int,int) p, int yChange, int xChange)
     {
         //checks if position is a valid move (touching another piece)
-        if (p.y + yChange < Game.rows && p.x + xChange < Game.cols &&
-            p.y + yChange >= 0 && p.x + xChange >= 0 &&
-            b[p.y + yChange, p.x + xChange] == ((int)Game.color.BLANK))
-            o.Add(new Point(p.y + yChange, p.x + xChange));
+        if (p.Item1 + yChange < Game.rows && p.Item2 + xChange < Game.cols &&
+            p.Item1 + yChange >= 0 && p.Item2 + xChange >= 0 &&
+            b[p.Item1 + yChange, p.Item2 + xChange] == ((int)Game.color.BLANK))
+            o.Add((p.Item1 + yChange, p.Item2 + xChange));
     }
 
 }
@@ -92,12 +99,6 @@ public class Point
         this.y = y;
         this.x = x;
     }
-    public override bool Equals(System.Object obj)
-    {
-        Point p = (Point) obj;
-        return  (y == p.y) && (x == p.x);        
-    }
-
     public override string ToString() { return $"({x},{y})"; }
 }
 
@@ -105,12 +106,14 @@ public class Board
 {
     public int[,] board; // [x] [y]
 
-    public HashSet<Point> pieces;
+    public HashSet<(int,int)> pieces;
     public int score; //black = positive, red = negative
     public int moveColor;
 
+    public Boolean tieGame = false;
 
-    public Board(int[,] board, HashSet<Point> pieces, int score, int moveColor)
+
+    public Board(int[,] board, HashSet<(int,int)> pieces, int score, int moveColor)
     {
         this.board = board;
         this.pieces = pieces;
@@ -120,9 +123,9 @@ public class Board
 
     public Board Move(Point p)
     {
-        Board newBoard = new Board((int[,])board.Clone(), new HashSet<Point>(pieces), score, moveColor); //new board instance
+        Board newBoard = new Board((int[,])board.Clone(), new HashSet<(int,int)>(pieces), score, moveColor); //new board instance
         newBoard.board[p.y, p.x] = moveColor; //add piece to board
-        newBoard.pieces.Add(new Point(p.y, p.x)); //add piece to list
+        newBoard.pieces.Add((p.y, p.x)); //add piece to list
         newBoard.score += AddToScore(p.y, p.x); //change score
         newBoard.moveColor = moveColor == ((int)Game.color.RED) ? ((int)Game.color.BLACK) : ((int)Game.color.RED); //change move color
         return newBoard;
@@ -140,32 +143,49 @@ public class Board
     private int CheckDirection(int y, int x, int moveColor, int yChange, int xChange)
     {
         int count = 1;
+        int blankCount = 0;
         int yPointer = y;
         int xPointer = x;
-        while (yPointer + yChange >= 0 && yPointer + yChange < Game.rows && xPointer + xChange >= 0 && xPointer + xChange < Game.cols && board[yPointer + yChange, xPointer + xChange] == moveColor)
+        while (yPointer + yChange >= 0 && yPointer + yChange < Game.rows && xPointer + xChange >= 0 && xPointer + xChange < Game.cols )
         {
-            count++;
-            yPointer += yChange;
-            xPointer += xChange;
+            if(board[yPointer + yChange, xPointer + xChange] == moveColor)
+            {
+                count++;
+                yPointer += yChange;
+                xPointer += xChange;
+            }
+            else
+            {
+                if(board[yPointer + yChange, xPointer + xChange] == (int)Game.color.BLANK) blankCount++;
+                break;
+            }
         }
         yPointer = y;
         xPointer = x;
         while (yPointer - yChange >= 0 && yPointer - yChange < Game.rows && xPointer - xChange >= 0 && xPointer - xChange < Game.cols && board[yPointer - yChange, xPointer - xChange] == moveColor)
         {
-            count++;
-            yPointer -= yChange;
-            xPointer -= xChange;
+            if (board[yPointer - yChange, xPointer - xChange] == moveColor)
+            {
+                count++;
+                yPointer -= yChange;
+                xPointer -= xChange;
+            }
+            else
+            {
+                if (board[yPointer - yChange, xPointer - xChange] == (int)Game.color.BLANK) blankCount++;
+                break;
+            }
         }
 
         int delta = 0;
         if (moveColor == (int)Game.color.RED)
         {
-            delta -= (int)Mathf.Pow(3, count - 1) - 1;
+            delta -= ((int)Mathf.Pow(3, count-1) + (int)Mathf.Pow(2, blankCount) - 2);
             if (count >= Game.winCount) delta -= 1000000000;
         }
         else
         {
-            delta += (int)Mathf.Pow(3, count - 1) - 1;
+            delta += ((int)Mathf.Pow(3, count-1) + (int)Mathf.Pow(2, blankCount) - 2);
             if (count >= Game.winCount) delta += 1000000000;
         }
         return delta;
