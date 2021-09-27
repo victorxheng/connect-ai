@@ -10,7 +10,7 @@ public class Pruned : MonoBehaviour
 
     private int maxEndNodes = 1000;
     int endNodes = 0;
-    int topMoves = 8;
+    int topMoves = 3;
 
     public Board ComputeMove(Board b)
     {
@@ -41,7 +41,7 @@ public class Pruned : MonoBehaviour
             if (endNodes <= maxEndNodes) limitedMovePoint = new Point(movePoint.y, movePoint.x);
             else break;
 
-            if (currentDepth > 10) break;
+            if (currentDepth > 5) break;
             currentDepth++;
         }
 
@@ -63,18 +63,31 @@ public class Pruned : MonoBehaviour
         //tie game
         if (moves.Count == 0) return 0;
 
-        List<(int,int,int)> movesRanking = new List<(int,int,int)>();
+        List<(int, int, int)> movesRanking = new List<(int, int, int)>();
+        /*
+        foreach ((int, int) p in moves)
+        {
+            if (Mathf.Abs(b.Move(new Point(p.Item1, p.Item2)).score) > 10000000)
+            {
+                return b.Move(new Point(p.Item1, p.Item2)).score;
+            }
+        }        */
 
         foreach ((int, int) p in moves)
         {
-            movesRanking.Add((b.Move(new Point(p.Item1, p.Item2)).score,p.Item1,p.Item2));
+            Board movedBoard = b.Move(new Point(p.Item1, p.Item2));
+            HashSet<(int, int)> newMoves = ValidMoves(movedBoard.board, movedBoard.pieces);
+
+            foreach ((int, int) secondP in newMoves)
+            {
+                movesRanking.Add((movedBoard.Move(new Point(secondP.Item1, secondP.Item2)).score, p.Item1, p.Item2));
+            }
         }
+
         movesRanking.Sort(ComparePoints);
         if (b.moveColor == (int)Game.color.RED) movesRanking.Reverse();
-       /* movesRanking.ForEach(delegate ((int, int, int) tuple)
-        {
-            Debug.Log(tuple.Item1);
-        });*/
+
+
 
         int value = b.moveColor == (int)Game.color.BLACK ? Int32.MinValue : Int32.MaxValue;
         for (int i = movesRanking.Count-1; i > movesRanking.Count - 1 - topMoves ; i--)

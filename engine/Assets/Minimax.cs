@@ -11,8 +11,6 @@ public class Minimax : MonoBehaviour
     private int maxEndNodes = 100000;
     int endNodes = 0;
     int prunedNodes = 0;
-    (double, double) averageList = (0, 0);
-    (double, double) averageList1 = (0, 0);
 
     Dictionary<string, int> enumeratedBoards = new Dictionary<string,int>();
 
@@ -26,16 +24,14 @@ public class Minimax : MonoBehaviour
 
         if (moves.Count == 0) { b.tieGame = true; return b; }//TIE GAME
 
-        int currentDepth = 4;
+        int currentDepth = 6;
         endNodes = 0;
         Point limitedMovePoint = new Point(0, 0);
 
-        //while (endNodes <= maxEndNodes)
+       // while (endNodes <= maxEndNodes)
         //{
             endNodes = 0;
         prunedNodes = 0;
-         averageList = (0, 0);
-         averageList1 = (0, 0);
         int value = b.moveColor == (int)Game.color.BLACK ? Int32.MinValue : Int32.MaxValue;
 
             Point movePoint = new Point(0, 0);
@@ -58,18 +54,16 @@ public class Minimax : MonoBehaviour
         }
         limitedMovePoint = new Point(movePoint.y, movePoint.x);
 
-        //Debug.Log($"Depth: {currentDepth}, Nodes: {endNodes}");
-        //  if (endNodes <= maxEndNodes) limitedMovePoint = new Point(movePoint.y, movePoint.x);
+      //  Debug.Log($"Depth: {currentDepth}, Nodes: {endNodes}");
+       //   if (endNodes <= maxEndNodes) limitedMovePoint = new Point(movePoint.y, movePoint.x);
         //  else break;
 
-        //  if (currentDepth > 10) break;
-        //  currentDepth++;
-        //}
+       //   if (currentDepth > 10) break;
+       //   currentDepth++;
+       // }
 
-        Debug.Log(endNodes);
-        Debug.Log("prunedNodes:" + prunedNodes);
-        //Debug.Log("average depth 2: " + averageList.Item1 / averageList.Item2) ;
-        //Debug.Log("average depth 3: " + averageList1.Item1 / averageList1.Item2);
+        //Debug.Log(endNodes);
+        //Debug.Log("prunedNodes:" + prunedNodes);
 
         if (Game.showBoard) game.AiMove(limitedMovePoint);
         return b.Move(limitedMovePoint);
@@ -108,7 +102,6 @@ public class Minimax : MonoBehaviour
         {
             //create list of all valid moves for given board
             HashSet<(int, int)> moves = ValidMoves(b.board, b.pieces);
-
 
             //tie game
             if (moves.Count == 0) return 0;
@@ -216,9 +209,6 @@ public class Point
 
 public class Board
 {
-
-
-
     int connectPower = 3;
     int blankPower = 2;
 

@@ -120,10 +120,14 @@ public class Game : MonoBehaviour
             return;
         }
 
+        System.Diagnostics.Stopwatch s = new System.Diagnostics.Stopwatch();
+        s.Start();
         AiThinking = true;
         b = ai.ComputeMove(b);
         //b = ai2.ComputeMove(b);
         AiThinking = false;
+        s.Stop();
+        Debug.Log(s.ElapsedMilliseconds);
 
         //max score of board: 100,000,000 (3^16)
         if (Mathf.Abs(b.score) > 100000000)
