@@ -59,7 +59,6 @@
     <Compile Include="Assets\Tile.cs" />
     <Compile Include="Assets\Minimax.cs" />
     <Compile Include="Assets\Game.cs" />
-    <Compile Include="Assets\Pruned.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

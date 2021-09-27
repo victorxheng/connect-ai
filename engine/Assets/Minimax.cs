@@ -8,9 +8,7 @@ public class Minimax : MonoBehaviour
 {
     public Game game;
 
-    private int maxEndNodes = 100000;
     int endNodes = 0;
-    int prunedNodes = 0;
 
     Dictionary<string, int> enumeratedBoards = new Dictionary<string,int>();
     public static string intialMoves = "";
@@ -18,7 +16,6 @@ public class Minimax : MonoBehaviour
 
     public Board ComputeMove(Board b)
     {
-        //PrintScores(b);
 
         HashSet<(int,int)> moves = ValidMoves(b.board, b.pieces);
         intialMoves += moves.Count+"\n";
@@ -31,10 +28,7 @@ public class Minimax : MonoBehaviour
         endNodes = 0;
         Point limitedMovePoint = new Point(0, 0);
 
-       // while (endNodes <= maxEndNodes)
-        //{
             endNodes = 0;
-        prunedNodes = 0;
         int value = b.moveColor == (int)Game.color.BLACK ? Int32.MinValue : Int32.MaxValue;
 
             Point movePoint = new Point(0, 0);
@@ -57,16 +51,6 @@ public class Minimax : MonoBehaviour
         }
         limitedMovePoint = new Point(movePoint.y, movePoint.x);
 
-        //  Debug.Log($"Depth: {currentDepth}, Nodes: {endNodes}");
-        //   if (endNodes <= maxEndNodes) limitedMovePoint = new Point(movePoint.y, movePoint.x);
-        //  else break;
-
-        //   if (currentDepth > 10) break;
-        //   currentDepth++;
-        // }
-
-        //Debug.Log(endNodes);
-        //Debug.Log("prunedNodes:" + prunedNodes);
 
         endNodesByMove += endNodes + "\n";
         if (Game.showBoard) game.AiMove(limitedMovePoint);
@@ -99,7 +83,6 @@ public class Minimax : MonoBehaviour
         if (enumeratedBoards.ContainsKey(s))
         {
             enumeratedBoards.TryGetValue(s, out int output);
-            prunedNodes++;
             return output;
         }
         else
@@ -216,11 +199,6 @@ public class Board
     int connectPower = 3;
     int blankPower = 2;
 
-    int blockPower = 3;
-    int blockBlank = 2;
-
-
-
     public int[,] board; // [x] [y]
 
     public HashSet<(int,int)> pieces;
@@ -244,7 +222,6 @@ public class Board
         newBoard.board[p.y, p.x] = moveColor; //add piece to board
         newBoard.pieces.Add((p.y, p.x)); //add piece to list
         newBoard.score += AddToScore(p.y, p.x); //change score
-        //if (Math.Abs(newBoard.score) > 10000000) newBoard.score = newBoard.score > 0 ? 1000000000 : -1000000000;
         newBoard.moveColor = moveColor == ((int)Game.color.RED) ? ((int)Game.color.BLACK) : ((int)Game.color.RED); //change move color
         return newBoard;
     }
@@ -282,25 +259,17 @@ public class Board
             else { if (board[yPointer, xPointer] == (int)Game.color.BLANK) blankCount++; break; }
         }
 
-        int newColor = moveColor == ((int)Game.color.RED) ? ((int)Game.color.BLACK) : ((int)Game.color.RED);
-        int oppositeCount = 1;
-        int oppositeBlanks = 0;
-        yPointer = y;
-        xPointer = x;
-
         int delta = 0;
         if (moveColor == (int)Game.color.RED)
         {
-            delta -= (int)(Mathf.Pow(connectPower, count) + Mathf.Pow(blankPower, blankCount));//+ Mathf.Pow(blockPower, oppositeCount) + Mathf.Pow(blockBlank, oppositeBlanks));
+            delta -= (int)(Mathf.Pow(connectPower, count) + Mathf.Pow(blankPower, blankCount));
             if (count >= Game.winCount)delta -= 1000000000;            
-            if (oppositeCount >= Game.winCount)delta -= 10000;
             
         }
         else
         {
-            delta += (int)(Mathf.Pow(connectPower, count) + Mathf.Pow(blankPower, blankCount)); //+ Mathf.Pow(blockPower, oppositeCount) + Mathf.Pow(blockBlank, oppositeBlanks));
+            delta += (int)(Mathf.Pow(connectPower, count) + Mathf.Pow(blankPower, blankCount));
             if (count >= Game.winCount) delta += 1000000000;
-            if (oppositeCount >= Game.winCount) delta += 10000;
         }
         return delta;
 
