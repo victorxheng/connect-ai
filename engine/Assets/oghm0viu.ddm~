@@ -13,7 +13,7 @@ public class Minimax : MonoBehaviour
     int prunedNodes = 0;
 
     Dictionary<string, int> enumeratedBoards = new Dictionary<string,int>();
-    public static string intialMoves = "";
+    public static string s = "";
     public static string endNodesByMove = "";
 
     public Board ComputeMove(Board b)
@@ -21,7 +21,7 @@ public class Minimax : MonoBehaviour
         //PrintScores(b);
 
         HashSet<(int,int)> moves = ValidMoves(b.board, b.pieces);
-        intialMoves += moves.Count+"\n";
+        s += moves.Count+"\n";
 
         if (b.pieces.Count == 0) return b.Move(new Point(Game.rows/2,Game.cols/2));
 
@@ -57,18 +57,17 @@ public class Minimax : MonoBehaviour
         }
         limitedMovePoint = new Point(movePoint.y, movePoint.x);
 
-        //  Debug.Log($"Depth: {currentDepth}, Nodes: {endNodes}");
-        //   if (endNodes <= maxEndNodes) limitedMovePoint = new Point(movePoint.y, movePoint.x);
+      //  Debug.Log($"Depth: {currentDepth}, Nodes: {endNodes}");
+       //   if (endNodes <= maxEndNodes) limitedMovePoint = new Point(movePoint.y, movePoint.x);
         //  else break;
 
-        //   if (currentDepth > 10) break;
-        //   currentDepth++;
-        // }
+       //   if (currentDepth > 10) break;
+       //   currentDepth++;
+       // }
 
         //Debug.Log(endNodes);
         //Debug.Log("prunedNodes:" + prunedNodes);
 
-        endNodesByMove += endNodes + "\n";
         if (Game.showBoard) game.AiMove(limitedMovePoint);
         return b.Move(limitedMovePoint);
     }

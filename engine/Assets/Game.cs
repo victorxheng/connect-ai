@@ -11,7 +11,7 @@ public class Game : MonoBehaviour
 
     public Board b;
 
-    public const bool showBoard = true;
+    public const bool showBoard = false;
 
     public GameObject horizontalLayoutGroup;
     public GameObject tile;
@@ -75,11 +75,16 @@ public class Game : MonoBehaviour
         }
     }
 
+    List<long> timeCharts = new List<long>();
     private void RobotPlaysItself()
     {
         while (true)
         {
+            System.Diagnostics.Stopwatch s = new System.Diagnostics.Stopwatch();
+            s.Start();
             b = ai.ComputeMove(b);
+            s.Stop();
+            timeCharts.Add(s.ElapsedMilliseconds);
 
             //max score of board: 100,000,000 (3^16)
             if (Mathf.Abs(b.score) > 100000000)
@@ -96,6 +101,13 @@ public class Game : MonoBehaviour
             }
         }
         b.PrintBoard();
+        string v = "";
+        foreach(long l in timeCharts)
+        {
+            v += l + "\n";
+        }
+        Debug.Log(v);
+        Debug.Log(Minimax.endNodesByMove);
     }
 
     public bool AiThinking = false;
