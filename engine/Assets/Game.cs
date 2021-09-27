@@ -21,6 +21,7 @@ public class Game : MonoBehaviour
     public int winner = ((int)color.BLANK);
 
     public Minimax ai;
+    public Pruned ai2;
 
     public Dictionary<(int,int), Tile> Layout;
 
@@ -121,6 +122,7 @@ public class Game : MonoBehaviour
 
         AiThinking = true;
         b = ai.ComputeMove(b);
+        //b = ai2.ComputeMove(b);
         AiThinking = false;
 
         //max score of board: 100,000,000 (3^16)
