@@ -24,7 +24,7 @@ public class Minimax : MonoBehaviour
 
         if (moves.Count == 0) { b.tieGame = true; return b; }//TIE GAME
 
-        int currentDepth = 4;
+        int currentDepth = 3;
         endNodes = 0;
         Point limitedMovePoint = new Point(0, 0);
 

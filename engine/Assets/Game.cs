@@ -11,7 +11,7 @@ public class Game : MonoBehaviour
 
     public Board b;
 
-    public const bool showBoard = false;
+    public const bool showBoard = true;
 
     public GameObject horizontalLayoutGroup;
     public GameObject tile;
