@@ -5,25 +5,27 @@ using UnityEngine.UI;
 
 public class Game : MonoBehaviour
 {
-    public const int rows = 20;
-    public const int cols = 20;
-    public const int winCount =5;
+    public
+    const int rows = 20;
+    public
+    const int cols = 20;
+    public
+    const int winCount = 5;
 
     public Board b;
 
-    public const bool showBoard = true;
+    public
+    const bool showBoard = true;
 
     public GameObject horizontalLayoutGroup;
     public GameObject tile;
     public Transform verticalLayoutGroup;
 
-
     public int winner = ((int)color.BLANK);
 
     public Minimax ai;
 
-    public Dictionary<(int,int), Tile> Layout;
-
+    public Dictionary<(int, int), Tile> Layout;
 
     public Sprite blank;
     public Sprite red;
@@ -42,7 +44,7 @@ public class Game : MonoBehaviour
     }
     private void newBoard()
     {
-        b = new Board(new int[rows, cols], new HashSet<(int,int)>(), 0, (int) color.RED);
+        b = new Board(new int[rows, cols], new HashSet<(int, int)>(), 0, (int)color.RED);
     }
 
     private void buildBoard() // renders the board on screen. clears anything already there
@@ -52,10 +54,10 @@ public class Game : MonoBehaviour
             RobotPlaysItself();
             return;
         }
-        Layout = new Dictionary<(int,int), Tile>();
+        Layout = new Dictionary<(int, int), Tile>();
 
         foreach (GameObject g in verticalLayoutGroup)
-        {//clear board
+        { //clear board
             Destroy(g);
         }
         //populate layout with buttons
@@ -66,10 +68,10 @@ public class Game : MonoBehaviour
             for (int j = 0; j < cols; j++)
             {
                 var square = GameObject.Instantiate(tile, t);
-                square.name = i+","+j;
+                square.name = i + "," + j;
                 Tile v = square.GetComponent<Tile>();
                 v.Init(i, j);
-                Layout.Add((i,j), v);
+                Layout.Add((i, j), v);
             }
         }
     }
@@ -101,7 +103,7 @@ public class Game : MonoBehaviour
         }
         b.PrintBoard();
         string v = "";
-        foreach(long l in timeCharts)
+        foreach (long l in timeCharts)
         {
             v += l + "\n";
         }
@@ -154,7 +156,7 @@ public class Game : MonoBehaviour
 
     public void AiMove(Point p)
     {
-        Tile t = Layout[(p.y,p.x)];
+        Tile t = Layout[(p.y, p.x)];
         if (b.moveColor == ((int)Game.color.RED))
         {
             t.self.sprite = red;
@@ -165,4 +167,3 @@ public class Game : MonoBehaviour
         }
     }
 }
-
